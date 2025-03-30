@@ -24,7 +24,7 @@ async function run() {
     const usersCollection = client.db("CoffeeStore").collection("users");
     const coffeesCollection = client.db("CoffeeStore").collection("coffees");
 
-    //For coffee
+    //For coffees CRUD Operation
     app.get("/coffees", async (req, res) => {
       const cursor = coffeesCollection.find();
       const result = await cursor.toArray();
@@ -72,6 +72,67 @@ async function run() {
       const coffeeId = req.params.id;
       const query = { _id: new ObjectId(coffeeId) };
       const result = await coffeesCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //For users CRUD Operation
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/users/:id", async (req, res) => {
+      const userId = req.params.id;
+      const query = { _id: new ObjectId(userId) };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
+    app.put("/users", async (req, res) => {
+      const signInUserData = req.body;
+      const UserEmail = signInUserData.email;
+      const UserLastSignIn = signInUserData.UserLastSignIn;
+      const filter = { email: UserEmail };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          userLastSignIn: UserLastSignIn,
+        },
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    app.patch("/users/:id", async (req, res) => {
+      const userId = req.params.id;
+      const updatedUser = req.body;
+      const filter = { _id: new ObjectId(userId) };
+      const updateDoc = {
+        $set: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          password: updatedUser.password,
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.delete("/users/:id", async (req, res) => {
+      const userId = req.params.id;
+      const query = { _id: new ObjectId(userId) };
+      const result = await usersCollection.deleteOne(query);
       res.send(result);
     });
 
