@@ -97,12 +97,17 @@ async function run() {
 
     app.put("/users", async (req, res) => {
       const signInUserData = req.body;
+      const UserName = signInUserData?.name;
       const UserEmail = signInUserData.email;
+      const UserPassword = signInUserData?.password;
       const UserLastSignIn = signInUserData.UserLastSignIn;
       const filter = { email: UserEmail };
       const options = { upsert: true };
       const updateDoc = {
         $set: {
+          name: UserName,
+          email: UserEmail,
+          password: UserPassword,
           userLastSignIn: UserLastSignIn,
         },
       };
